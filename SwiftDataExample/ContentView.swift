@@ -1,0 +1,53 @@
+//
+//  ContentView.swift
+//  SwiftDataExample
+//  https://youtu.be/e0WorWOu2HY?si=Sev_CmqMO5l51xd8
+//  Created by Uri on 26/11/23.
+//
+
+import SwiftUI
+import SwiftData
+
+struct ContentView: View {
+    
+    @Environment (\.modelContext) private var context
+    @Query(sort: \CountryModel.name, order: .forward) var countries: [CountryModel]
+    
+    var body: some View {
+        NavigationView {
+            VStack {
+                List {
+                    ForEach(countries) { country in
+                        Text("\(country.code) - \(country.name)")
+                    }
+                    .onDelete(perform: { indexSet in
+                        let countryToDelete = countries[indexSet.first!]
+                        context.delete(countryToDelete)
+                    })
+                }
+                .navigationTitle("Countries")
+                .toolbar {
+                    Button(action: {
+                        countries.forEach { country in
+                            context.delete(country)
+                        }
+                    }, label: {
+                        Image(systemName: "trash.fill")
+                            .foregroundColor(.red)
+                    })
+                    
+                    Button(action: {
+                        context.insert(CountryModel.getRandomCountry())
+                    }, label: {
+                        Image(systemName: "plus.square.fill")
+                    })
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    ContentView()
+        .modelContainer(for: CountryModel.self, inMemory: true)
+}
