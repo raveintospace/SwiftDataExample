@@ -13,6 +13,7 @@ class CountryModel {
     var id = UUID()
     var name: String
     var code: String
+    var cities: [CityModel]?
     
     internal init(name: String, code: String) {
         self.name = name
