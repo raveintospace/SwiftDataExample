@@ -13,6 +13,9 @@ class CountryModel {
     var id = UUID()
     var name: String
     var code: String
+    
+    // delete all childs (cities) of the CountryModel
+    @Relationship(deleteRule: .cascade, inverse: \CityModel.country)
     var cities: [CityModel]?
     
     internal init(name: String, code: String) {
