@@ -24,28 +24,9 @@ struct ContentView: View {
             }
             .navigationTitle("Countries")
             .toolbar {
-                Button(action: {
-                    countries.forEach { country in
-                        context.delete(country)
-                    }
-                }, label: {
-                    Image(systemName: "trash.fill")
-                        .foregroundColor(.red)
-                })
-                
-                Button(action: {
-                    context.insert(CountryModel.getRandomCountry())
-                }, label: {
-                    Image(systemName: "plus.square.fill")
-                })
-                
-                Menu("Sort", systemImage: "slider.horizontal.3") {
-                    Picker("Sort", selection: $filteredBy) {
-                        Text("Name").tag(SortDescriptor(\CountryModel.name))
-                        Text("Code").tag(SortDescriptor(\CountryModel.code))
-                        Text("Date").tag(SortDescriptor(\CountryModel.date))
-                    }
-                }
+                deleteButton
+                addCountryButton
+                sortMenu
             }
         }
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: Text(""))
@@ -93,6 +74,38 @@ struct CountryListView: View {
                 let countryToDelete = countries[indexSet.first!]
                 context.delete(countryToDelete)
             })
+        }
+    }
+}
+
+extension ContentView {
+    
+    var deleteButton: some View {
+        Button(action: {
+            countries.forEach { country in
+                context.delete(country)
+            }
+        }, label: {
+            Image(systemName: "trash.fill")
+                .foregroundColor(.red)
+        })
+    }
+    
+    var addCountryButton: some View {
+        Button(action: {
+            context.insert(CountryModel.getRandomCountry())
+        }, label: {
+            Image(systemName: "plus.square.fill")
+        })
+    }
+    
+    var sortMenu: some View {
+        Menu("Sort", systemImage: "slider.horizontal.3") {
+            Picker("Sort", selection: $filteredBy) {
+                Text("Name").tag(SortDescriptor(\CountryModel.name))
+                Text("Code").tag(SortDescriptor(\CountryModel.code))
+                Text("Date").tag(SortDescriptor(\CountryModel.date))
+            }
         }
     }
 }
