@@ -12,14 +12,16 @@ struct ContentView: View {
     
     @Environment (\.modelContext) private var context
     @Query(sort: \CountryModel.name, order: .forward) var countries: [CountryModel]
+    @State var searchText: String = ""
     
     var body: some View {
         NavigationView {
             VStack {
-                CountryListView()
+                CountryListView(search: searchText)
             }
             .navigationTitle("Countries")
         }
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: Text(""))
     }
 }
 
@@ -32,6 +34,15 @@ struct CountryListView: View {
     
     @Environment (\.modelContext) private var context
     @Query(sort: \CountryModel.name, order: .forward) var countries: [CountryModel]
+    
+    // search logic
+    init(search: String) {
+        if !search.isEmpty {
+            self._countries = Query(filter: #Predicate { $0.name.localizedStandardContains(search) })
+        } else {
+            self._countries = Query()
+        }
+    }
     
     var body: some View {
         List {
