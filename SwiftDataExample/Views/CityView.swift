@@ -52,8 +52,8 @@ struct CityView: View {
                             
                         }, label: {
                             Image(systemName: "tray.and.arrow.down.fill")
-                                .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
                         })
+                        .buttonStyle(SaveCountryNameButtonStyle())
                     }
                 }
                 Section("Cities") {
@@ -95,7 +95,6 @@ struct CityView: View {
             }
             .navigationTitle("Cities")
         }
-        
     }
 }
 
