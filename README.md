@@ -13,3 +13,5 @@ This app features:
 <li>Relationships One-to-Many: One Country has several cities</li>
 <br/>
 <li>Data filtered and ordered on demand</li>
+<br/>
+<li>Custom ButtonStyle Animation</li>
