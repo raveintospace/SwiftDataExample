@@ -12,14 +12,41 @@ struct ContentView: View {
     
     @Environment (\.modelContext) private var context
     @Query(sort: \CountryModel.name, order: .forward) var countries: [CountryModel]
+    
     @State var searchText: String = ""
+    
+    @State var filteredBy = SortDescriptor(\CountryModel.name, order: .forward)
     
     var body: some View {
         NavigationView {
             VStack {
-                CountryListView(search: searchText)
+                CountryListView(search: searchText, sort: filteredBy)
             }
             .navigationTitle("Countries")
+            .toolbar {
+                Button(action: {
+                    countries.forEach { country in
+                        context.delete(country)
+                    }
+                }, label: {
+                    Image(systemName: "trash.fill")
+                        .foregroundColor(.red)
+                })
+                
+                Button(action: {
+                    context.insert(CountryModel.getRandomCountry())
+                }, label: {
+                    Image(systemName: "plus.square.fill")
+                })
+                
+                Menu("Sort", systemImage: "slider.horizontal.3") {
+                    Picker("Sort", selection: $filteredBy) {
+                        Text("Name").tag(SortDescriptor(\CountryModel.name))
+                        Text("Code").tag(SortDescriptor(\CountryModel.code))
+                        Text("Date").tag(SortDescriptor(\CountryModel.date))
+                    }
+                }
+            }
         }
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .automatic), prompt: Text(""))
     }
@@ -35,41 +62,36 @@ struct CountryListView: View {
     @Environment (\.modelContext) private var context
     @Query(sort: \CountryModel.name, order: .forward) var countries: [CountryModel]
     
+    private var sort: SortDescriptor<CountryModel>
+    
     // search logic
-    init(search: String) {
+    init(search: String, sort: SortDescriptor<CountryModel>) {
         if !search.isEmpty {
-            self._countries = Query(filter: #Predicate { $0.name.localizedStandardContains(search) })
+            self._countries = Query(filter: #Predicate { $0.name.localizedStandardContains(search) },
+                                    sort: [sort],
+                                    transaction: Transaction(animation: .easeIn))
         } else {
-            self._countries = Query()
+            self._countries = Query(sort: [sort],
+                                    transaction: Transaction(animation: .easeIn))
         }
+        
+        self.sort = sort
     }
     
     var body: some View {
         List {
             ForEach(countries) { country in
                 NavigationLink(destination: CityView(country: country)) {
-                    Text("\(country.code) - \(country.name)")
+                    VStack(alignment: .leading) {
+                        Text("\(country.code) - \(country.name)")
+                        Text("Date: \(country.date, format: .dateTime.month().year().day().hour().minute().second())")
+                            .foregroundColor(.gray)
+                    }
                 }
             }
             .onDelete(perform: { indexSet in
                 let countryToDelete = countries[indexSet.first!]
                 context.delete(countryToDelete)
-            })
-        }
-        .toolbar {
-            Button(action: {
-                countries.forEach { country in
-                    context.delete(country)
-                }
-            }, label: {
-                Image(systemName: "trash.fill")
-                    .foregroundColor(.red)
-            })
-            
-            Button(action: {
-                context.insert(CountryModel.getRandomCountry())
-            }, label: {
-                Image(systemName: "plus.square.fill")
             })
         }
     }
