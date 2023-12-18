@@ -13,9 +13,9 @@ struct ContentView: View {
     @Environment (\.modelContext) private var context
     @Query(sort: \CountryModel.name, order: .forward) var countries: [CountryModel]
     
-    @State var searchText: String = ""
+    @State private var searchText: String = ""
     
-    @State var filteredBy = SortDescriptor(\CountryModel.name, order: .forward)
+    @State private var filteredBy = SortDescriptor(\CountryModel.name, order: .forward)
     
     var body: some View {
         NavigationView {
@@ -80,7 +80,7 @@ struct CountryListView: View {
 
 extension ContentView {
     
-    var deleteButton: some View {
+    private var deleteButton: some View {
         Button(action: {
             countries.forEach { country in
                 context.delete(country)
@@ -91,7 +91,7 @@ extension ContentView {
         })
     }
     
-    var addCountryButton: some View {
+    private var addCountryButton: some View {
         Button(action: {
             context.insert(CountryModel.getRandomCountry())
         }, label: {
@@ -99,7 +99,7 @@ extension ContentView {
         })
     }
     
-    var sortMenu: some View {
+    private var sortMenu: some View {
         Menu("Sort", systemImage: "slider.horizontal.3") {
             Picker("Sort", selection: $filteredBy) {
                 Text("Name").tag(SortDescriptor(\CountryModel.name))
